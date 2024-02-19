@@ -185,9 +185,39 @@ app.get('/houses', async (req, res) => {
 app.put('/houses/:id', async (req, res) => {
     try {
         const houseId = req.params.id;
-        const { status } = req.body;
-        const query = 'UPDATE houses SET status = ? WHERE id = ?';
-        await db.promise().execute(query, [status, houseId]);
+        const { status, sale_price, owner_phone_number } = req.body;
+
+        // Build the dynamic update query based on the provided fields
+        const updateFields = [];
+        const updateValues = [];
+
+        if (status !== undefined) {
+            updateFields.push('status = ?');
+            updateValues.push(status);
+        }
+
+        if (sale_price !== undefined) {
+            updateFields.push('sale_price = ?');
+            updateValues.push(sale_price);
+        }
+
+        if (owner_phone_number !== undefined) {
+            updateFields.push('owner_phone_number = ?');
+            updateValues.push(owner_phone_number);
+        }
+
+        if (updateFields.length === 0) {
+            // If no fields to update were provided in the request payload
+            return res.status(400).json({ error: 'No valid fields to update' });
+        }
+
+        const query = `UPDATE houses SET ${updateFields.join(', ')} WHERE id = ?`;
+
+        const updateParams = [...updateValues, houseId];
+        console.log(updateFields, updateValues, query, updateParams)
+
+        await db.promise().execute(query, updateParams);
+
         res.status(200).json({ message: 'House details updated successfully' });
     } catch (err) {
         console.error('Error updating data:', err);
