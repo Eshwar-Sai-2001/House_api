@@ -13,7 +13,8 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'Eshwar@394',
-    database: 'house_database'
+    database: 'house_database',
+    charset: 'utf8mb4'
 });
 
 db.connect((err) => {
@@ -203,3 +204,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
+module.exports = {app, db};

@@ -1,3 +1,7 @@
+const supertest = require('supertest');
+const { app,db } = require('./app'); // Adjust the path accordingly
+
+
 describe('House API', () => {
     const request = supertest(app);
 
@@ -5,7 +9,8 @@ describe('House API', () => {
         const response = await request
             .post('/houses')
             .send({
-                owner: 'John Doe',
+                owner_name: 'John Doe',
+                owner_phone_number: '1234567890',
                 area: '200 sq. ft',
                 sale_price: 100000,
                 negotiable: true
@@ -18,15 +23,16 @@ describe('House API', () => {
         const uploadResponse = await request
             .post('/houses')
             .send({
-                owner: 'Jane Doe',
-                area: '150 sq. ft',
-                sale_price: 80000,
-                negotiable: false
+                owner_name: 'Jane Doe',
+                owner_phone_number: '1234567890',
+                area: '200 sq. ft',
+                sale_price: 100000,
+                negotiable: true
             });
 
         const response = await request.get(`/houses/${uploadResponse.body.id}`);
         expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveProperty('owner', 'Jane Doe');
+        expect(response.body).toHaveProperty('owner_name', 'Jane Doe');
     });
 
     it('should list all houses', async () => {
@@ -39,9 +45,10 @@ describe('House API', () => {
         const uploadResponse = await request
             .post('/houses')
             .send({
-                owner: 'James Doe',
-                area: '250 sq. ft',
-                sale_price: 120000,
+                owner_name: 'John Doe',
+                owner_phone_number: '1234567890',
+                area: '200 sq. ft',
+                sale_price: 100000,
                 negotiable: true
             });
 
@@ -51,5 +58,10 @@ describe('House API', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('message', 'House details updated successfully');
+    });
+    afterAll(() => {
+        if (db) {
+            db.end();
+        }
     });
 });
